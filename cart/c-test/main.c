@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
-#include "kernel/buttons.h"
-#include "kernel/vdp.h"
+#include <buttons.h>
+#include <vdp.h>
 
 uint8_t tiles[] = {
     0x11, 0x11, 0x11, 0x11,

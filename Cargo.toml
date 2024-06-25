@@ -2,6 +2,7 @@
 name = "zconsole"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dependencies]
 log = "0.4"
@@ -9,3 +10,7 @@ pixels = "0.13.0"
 winit = "0.28"
 winit_input_helper = "0.14"
 z80emu = "0.7.0"
+
+[build-dependencies]
+anyhow = "1.0"
+vergen = { version = "8", features = ["build", "git", "gitcl"] }

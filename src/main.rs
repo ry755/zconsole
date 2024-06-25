@@ -26,8 +26,7 @@ use z80emu::*;
 const WINDOW_SCALE: usize = 2;
 
 fn main() {
-    //let version_string = format!("zconsole {} ({})", env!("VERGEN_BUILD_SEMVER"), env!("VERGEN_GIT_SHA_SHORT"));
-    let version_string = "zconsole".to_string();
+    let version_string = format!("zconsole {} ({})", env!("CARGO_PKG_VERSION"), env!("VERGEN_GIT_SHA"));
 
     let args: Vec<String> = args().collect();
 

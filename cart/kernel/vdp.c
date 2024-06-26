@@ -27,7 +27,7 @@ volatile __sfr __at VDP_DATA_PORT vdp_data_io;
     { vdp_addr_low_io = addr & 0x00FF; vdp_addr_high_io = addr >> 8; }
 
 // copy tiles into the VDP's memory
-void copy_tiles(uint8_t tile_table[], uint8_t number_of_tiles) {
+void copy_tiles(uint8_t tile_table[], uint16_t number_of_tiles) {
     vdp_set_address(TILE_TABLE);
     for (uint16_t i = 0; i < number_of_tiles * TILE_SIZE; i++) {
         vdp_data_io = tile_table[i];
@@ -43,10 +43,20 @@ void clear_tile_table() {
     }
 }
 
+// set all tile pointers to specified tile
+void fill_tile_table(uint16_t tile) {
+    uint16_t source_tile_address = TILE_TABLE + (tile * TILE_SIZE);
+    vdp_set_address(BACKGROUND_TABLE);
+    for (uint16_t i = 0; i < TILES_TALL*TILES_WIDE; i++) {
+        vdp_data_io = source_tile_address & 0xFF;
+        vdp_data_io = source_tile_address >> 8;
+    }
+}
+
 // set a tile at the specified coordinates
-void set_tile(uint8_t x, uint8_t y, uint8_t tile) {
+void set_tile(uint8_t x, uint8_t y, uint16_t tile) {
     uint16_t address = BACKGROUND_TABLE + ((y * TILES_WIDE) + x) * 2;
-    uint16_t source_tile_address = TILE_TABLE + ((uint16_t)tile * TILE_SIZE);
+    uint16_t source_tile_address = TILE_TABLE + (tile * TILE_SIZE);
     vdp_set_address(address);
     vdp_data_io = source_tile_address & 0xFF;
     vdp_data_io = source_tile_address >> 8;
@@ -69,7 +79,9 @@ void print(uint8_t x, uint8_t y, char string[]) {
     uint16_t address = BACKGROUND_TABLE + (y * TILES_WIDE) + x;
     vdp_set_address(address);
     while (*string) {
-        vdp_data_io = *string + font_offset;
+        uint16_t source_tile_address = font_offset + TILE_TABLE + ((uint16_t) *string * TILE_SIZE);
+        vdp_data_io = source_tile_address & 0xFF;
+        vdp_data_io = source_tile_address >> 8;
         string++;
     }
 }

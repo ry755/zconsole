@@ -3,7 +3,9 @@
 #include <buttons.h>
 #include <vdp.h>
 
-uint8_t tiles[] = {
+#include <font.h>
+
+const uint8_t tiles[] = {
     0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11,
     0x11, 0x11, 0x11, 0x11,
@@ -26,10 +28,12 @@ uint8_t tiles[] = {
 
 void main() {
     // copy tile data into VDP memory
+    copy_tiles(font, 256);
     copy_tiles(tiles, 2);
-    clear_tile_table();
+    fill_tile_table(0xFF);
 
-    set_tile(1, 1, 1);
+    set_font_offset(0);
+    print(0, 0, "hello!!\x01");
 
     while(1);
 }

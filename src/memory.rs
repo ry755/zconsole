@@ -1,7 +1,7 @@
 // memory.rs
 
-pub type MemoryCart = [u8; 32*1024];
-pub type MemoryRam = [u8; 64*1024];
+pub type MemoryCart = [u8; 32 * 1024];
+pub type MemoryRam = [u8; 64 * 1024];
 
 pub struct Memory {
     pub cart: MemoryCart,
@@ -11,7 +11,11 @@ pub struct Memory {
 
 impl Memory {
     pub fn new(cart: MemoryCart, ram: MemoryRam) -> Self {
-        Memory { cart, cart_enabled: true, ram }
+        Memory {
+            cart,
+            cart_enabled: true,
+            ram,
+        }
     }
 
     pub fn read_memory(&self, address: u16) -> u8 {

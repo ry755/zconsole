@@ -9,14 +9,14 @@ pub struct Buttons {
     back: bool,
 }
 
-impl std::convert::From<&Buttons> for u8  {
+impl std::convert::From<&Buttons> for u8 {
     fn from(buttons: &Buttons) -> u8 {
-        (if buttons.up     { 1 } else { 0 }) << 5 |
-        (if buttons.down   { 1 } else { 0 }) << 4 |
-        (if buttons.left   { 1 } else { 0 }) << 3 |
-        (if buttons.right  { 1 } else { 0 }) << 2 |
-        (if buttons.select { 1 } else { 0 }) << 1 |
-        (if buttons.back   { 1 } else { 0 })
+        (if buttons.up { 1 } else { 0 }) << 5
+            | (if buttons.down { 1 } else { 0 }) << 4
+            | (if buttons.left { 1 } else { 0 }) << 3
+            | (if buttons.right { 1 } else { 0 }) << 2
+            | (if buttons.select { 1 } else { 0 }) << 1
+            | (if buttons.back { 1 } else { 0 })
     }
 }
 

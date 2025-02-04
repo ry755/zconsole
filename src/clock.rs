@@ -1,10 +1,10 @@
 // clock.rs
 
-use core::num::{NonZeroU8, NonZeroU16};
-use core::ops::{Deref, DerefMut};
 use core::num::Wrapping;
-use z80emu::host::{cycles, Clock};
+use core::num::{NonZeroU16, NonZeroU8};
+use core::ops::{Deref, DerefMut};
 use cycles::*;
+use z80emu::host::{cycles, Clock};
 
 pub type Ts = u32;
 
@@ -16,7 +16,10 @@ pub struct TClock {
 
 impl TClock {
     pub fn new(clock_hz: Ts) -> Self {
-        TClock { current: Wrapping(0), clock_hz }
+        TClock {
+            current: Wrapping(0),
+            clock_hz,
+        }
     }
 
     pub fn reset(&mut self) {
@@ -34,11 +37,10 @@ impl TClock {
     }
 
     pub fn check_wrap_second(&mut self) -> bool {
-        if self.current.0 > 2*self.clock_hz {
+        if self.current.0 > 2 * self.clock_hz {
             self.current -= Wrapping(self.clock_hz);
             true
-        }
-        else {
+        } else {
             false
         }
     }

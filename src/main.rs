@@ -9,16 +9,16 @@ pub mod vdp;
 use bus::Bus;
 use buttons::{Button, Buttons};
 use clock::TClock;
-use memory::Memory;
 use log::error;
+use memory::Memory;
 use pixels::{Pixels, SurfaceTexture};
 use std::process::exit;
 use std::sync::{Arc, Mutex};
-use std::{fs::read, env::args, thread::Builder};
-use vdp::{Vdp, WIDTH, HEIGHT};
-use winit::event::{Event, WindowEvent, ElementState};
-use winit::event_loop::{ControlFlow, EventLoop};
+use std::{env::args, fs::read, thread::Builder};
+use vdp::{Vdp, HEIGHT, WIDTH};
 use winit::dpi::LogicalSize;
+use winit::event::{ElementState, Event, WindowEvent};
+use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
 use z80emu::*;
@@ -26,7 +26,11 @@ use z80emu::*;
 const WINDOW_SCALE: usize = 2;
 
 fn main() {
-    let version_string = format!("zconsole {} ({})", env!("CARGO_PKG_VERSION"), env!("VERGEN_GIT_SHA"));
+    let version_string = format!(
+        "zconsole {} ({})",
+        env!("CARGO_PKG_VERSION"),
+        env!("VERGEN_GIT_SHA")
+    );
 
     let args: Vec<String> = args().collect();
 
@@ -39,9 +43,9 @@ fn main() {
     let mut clock = TClock::new(8_000_000); // TODO: actually use this
     let mut cpu = Z80CMOS::default();
     let mut memory = Memory {
-        cart: [0; 32*1024],
+        cart: [0; 32 * 1024],
         cart_enabled: true,
-        ram: [0; 64*1024],
+        ram: [0; 64 * 1024],
     };
     let cart = read(&args[1]).expect("failed to open the cart image!");
     for (i, x) in cart.iter().enumerate() {
@@ -50,39 +54,49 @@ fn main() {
     let vdp = Arc::new(Mutex::new(Vdp::new()));
 
     let builder = Builder::new().name("cpu".to_string());
-    builder.spawn({
-        let mut bus = Bus { buttons: buttons.clone(), memory, vdp: vdp.clone(), reset: false };
-        move || {
-            cpu.reset();
-            loop {
-                match cpu.execute_next(&mut bus, &mut clock, Some(|_| {})) {
-                    Err(BreakCause::Halt) => {
-                        println!("CPU halted");
-                        break;
-                    },
-                    _ => {}
+    builder
+        .spawn({
+            let mut bus = Bus {
+                buttons: buttons.clone(),
+                memory,
+                vdp: vdp.clone(),
+                reset: false,
+            };
+            move || {
+                cpu.reset();
+                loop {
+                    match cpu.execute_next(&mut bus, &mut clock, Some(|_| {})) {
+                        Err(BreakCause::Halt) => {
+                            println!("CPU halted");
+                            break;
+                        }
+                        _ => {}
+                    }
                 }
             }
-        }
-    }).unwrap();
+        })
+        .unwrap();
 
     let event_loop = EventLoop::new();
-        let mut input = WinitInputHelper::new();
-        let window = {
-            let size = LogicalSize::new((WIDTH * WINDOW_SCALE) as f64, (HEIGHT * WINDOW_SCALE) as f64);
-            WindowBuilder::new()
-                .with_title(version_string)
-                .with_inner_size(size)
-                .with_min_inner_size(size)
-                .build(&event_loop)
-                .unwrap()
-        };
+    let mut input = WinitInputHelper::new();
+    let window = {
+        let size = LogicalSize::new(
+            (WIDTH * WINDOW_SCALE) as f64,
+            (HEIGHT * WINDOW_SCALE) as f64,
+        );
+        WindowBuilder::new()
+            .with_title(version_string)
+            .with_inner_size(size)
+            .with_min_inner_size(size)
+            .build(&event_loop)
+            .unwrap()
+    };
 
-        let mut pixels = {
-            let window_size = window.inner_size();
-            let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-            Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture).unwrap()
-        };
+    let mut pixels = {
+        let window_size = window.inner_size();
+        let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+        Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture).unwrap()
+    };
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Poll;
@@ -141,5 +155,4 @@ fn main() {
             }
         }
     });
-
 }
